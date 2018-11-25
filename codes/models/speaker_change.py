@@ -16,7 +16,7 @@ def log_likelihood(data, mu, std):
 
 def BIC(a,b):
     na, mua, stda = mle_normal(a)
-    na, mua, stda = mle_normal(b)
+    na, mua, stda = mle_normal(b) # shouldn't this nb,mub, stdb
 
     c             = a + b
     nc, muc, stdc = mle_normal(c)
