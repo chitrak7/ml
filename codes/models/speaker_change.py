@@ -18,7 +18,11 @@ def log_likelihood(data, mu, std):
 
 def BIC(a,b):
     na, mua, stda = mle_normal(a)
+<<<<<<< HEAD
     nb, mub, stdb = mle_normal(b)
+=======
+    na, mua, stda = mle_normal(b) # shouldn't this nb,mub, stdb
+>>>>>>> 7048973fb3518f8f8805b27bd717a9c81fd7b839
 
     c             = np.concatenate((a, b), axis=0)
     nc, muc, stdc = mle_normal(c)
