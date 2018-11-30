@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.stats import multivariate_normal
+import matplotlib.pyplot as plt
+
 def mle_normal(data):
     n   = data.shape[0]
     m   = data.shape[1]
@@ -16,9 +18,9 @@ def log_likelihood(data, mu, std):
 
 def BIC(a,b):
     na, mua, stda = mle_normal(a)
-    na, mua, stda = mle_normal(b)
+    nb, mub, stdb = mle_normal(b)
 
-    c             = a + b
+    c             = np.concatenate((a, b), axis=0)
     nc, muc, stdc = mle_normal(c)
     lla           = log_likelihood(a, mua, stda)
     llb           = log_likelihood(b, mub, stdb)
@@ -27,7 +29,8 @@ def BIC(a,b):
     return (llc - lla - llb)/nc
 
 def speaker_change(data, window_size):
-    threshold = 0.1
+    data = np.array(data)
+    threshold = -15
 
     y = []
     n_windows = data.shape[0]
@@ -35,7 +38,8 @@ def speaker_change(data, window_size):
     for i in range(n_windows-1):
         y.append(BIC(data[i], data[i+1]))
 
-    change = [(i>threshold) for i in y]
+    change = [(i<threshold) for i in y]
+    print([(i) for i in y if (i<threshold)])
     time   = [(i+1) for i in range(len(change)) if change[i]]
 
     return np.array(time)

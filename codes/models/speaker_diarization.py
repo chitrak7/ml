@@ -1,7 +1,9 @@
 import numpy as np
-import speaker_change
+import models.speaker_change as sc
+from scipy.stats import multivariate_normal
 
 def mle_normal(data):
+    data = np.array(data)
     n   = data.shape[0]
     m   = data.shape[1]
     mu  = np.mean(data, axis=0)
@@ -10,14 +12,14 @@ def mle_normal(data):
 
 def log_likelihood(data, mu, std):
     ll = 0
-    y = multivariate_normal.pdf(x, mean=mu, cov=std);
+    y = multivariate_normal.pdf(data, mean=mu, cov=std);
     for yp in y:
         ll += np.log(yp)
     return ll
 
 def BIC(a,b):
     na, mua, stda = mle_normal(a)
-    na, mua, stda = mle_normal(b)
+    nb, mub, stdb = mle_normal(b)
 
     c             = a + b
     nc, muc, stdc = mle_normal(c)
@@ -28,8 +30,9 @@ def BIC(a,b):
     return (llc - lla - llb)/nc
 
 def speaker_diarization(data, window_size):
-    threshold = 0.1
-    changes   = speaker_change.speaker_change(data, window_size)
+    data = np.array(data)
+    threshold = -12
+    changes   = sc.speaker_change(data, window_size)
 
     segments = [(0, changes[0])]
     for i in range(changes.shape[0]-1):
@@ -42,7 +45,7 @@ def speaker_diarization(data, window_size):
             speaker1.append(j)
 
     speakers = [speaker1]
-
+    timeframe = [[(segments[0][0]*window_size, segments[0][1]*window_size)]]
     for segment in segments[1:]:
         t = threshold
         j = -1
@@ -54,14 +57,17 @@ def speaker_diarization(data, window_size):
 
         for i in range(len(speakers)):
             bic = BIC(speakers[i], speaker)
-            if(bic < t):
+            if(bic > t):
                 j = i
                 t = bic
 
         if(j==-1):
             speakers.append(speaker)
+            timeframe.append([(segment[0]*window_size, segment[1]*window_size)])
         else:
+            timeframe[j].append((segment[0]*window_size, segment[1]*window_size))
             for k in speaker:
                 speakers[j].append(k)
 
-    return speakers
+
+    return timeframe

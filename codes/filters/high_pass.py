@@ -2,11 +2,11 @@ import librosa
 import numpy as np
 from scipy.signal import butter, lfilter
 
-Class Mfcc_Filter:
-    def __init__(self, window_size, cutoff=250, order=5):
-        self.window_len = window_len
-        self.cutoff     = cutoff
-        self.order      = order
+class High_Pass:
+    def __init__(self, window_size, cutoff=25, order=5):
+        self.window_size = window_size
+        self.cutoff      = cutoff
+        self.order       = order
 
     def filter(self, y, sr):
         window_size = self.window_size
@@ -25,11 +25,10 @@ Class Mfcc_Filter:
             end   = start + sample_size
             yp    = y[start:end]
 
-            b, a  = butter(order, high, 'high',  btype='band')
+            b, a  = butter(order, high, 'high')
             yp    = lfilter(b, a, yp)
-            yp    = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
-            yp    = yp.T
+
 
             data.append(yp)
-
-        return data
+        data = np.array(data)
+        return data.flatten()

@@ -6,6 +6,7 @@ def load_audio_file(musicFile, sr=22050):
     breakInterval = 3600
     segLength     = 1
     data          = []
+
     audioDuration = get_duration(filename=musicFile) // 1.0
     numSegments   = int(audioDuration // breakInterval)
 
@@ -13,12 +14,18 @@ def load_audio_file(musicFile, sr=22050):
         st      = time.time()
         offset  = i * breakInterval
         y , srp = load(musicFile, sr=sr, duration=breakInterval, offset=offset, res_type='kaiser_fast' )
-        data    = data + y
+        if (i==0):
+            data = y
+        else:
+            data    = data + y
 
     offset   = numSegments * breakInterval
     duration = audioDuration - offset
     y , srp  = load(musicFile, sr=sr, duration=duration, offset=offset, res_type='kaiser_fast' )
-    data     = data + y
+    if(len(data)==0):
+        data = y
+    else:
+        data     = data + y
 
     return data
 

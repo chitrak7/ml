@@ -9,7 +9,7 @@ def speech_detection(data, model, window_size):
     data   = np.array([np.mean(i, axis=0) for i in data])
     model  = load_model(model)
     result = np.argmax(model.predict(data), axis=1)
-    return result
+    return np.array([[i] for i in range(len(result)) if (result[i]==0)]).flatten()
 
 def train_speech_detection_model(data, labels, window_size, target):
     data   = np.array([np.mean(i, axis=0) for i in data])
